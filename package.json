@@ -11,21 +11,22 @@
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "framer-motion": "^12.17.0",
+    "geist": "1.4.2",
     "keen-slider": "^6.8.6",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.514.0",
-    "next": "^15.4.6",
-    "react": "^19.1.1",
+    "next": "14.2.31",
+    "react": "18.3.1",
     "react-countup": "^6.5.3",
-    "react-dom": "^19.1.1"
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "24.0.0",
-    "@types/react": "19.1.7",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.3",
+    "@types/react": "18.3.23",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.11",
     "tailwindcss": "^4"
   }
 }
