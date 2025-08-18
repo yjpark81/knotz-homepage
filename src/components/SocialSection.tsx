@@ -1,5 +1,7 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
+import Link from 'next/link';
+import Image from 'next/image';
 
 const leftImages = ["/art1.jpg", "/art2.jpg", "/art3.jpg", "/art4.jpg"];
 const rightImages = ["/art5.jpg", "/art6.jpg", "/art7.jpg", "/art8.jpg"];
@@ -21,9 +23,9 @@ export default function SocialSection() {
 
   useEffect(() => {
     if (leftListRef.current) {
-      const imgs = leftListRef.current.querySelectorAll("img");
-      if (imgs.length > 0) {
-        const h = imgs[0].clientHeight;
+      const Images = leftListRef.current.querySelectorAll("Image");
+      if (Images.length > 0) {
+        const h = Images[0].clientHeight;
         setItemHeight(h);
         setRollingSetHeight(h * leftImages.length + gapPx * (leftImages.length - 1));
       }
@@ -98,7 +100,7 @@ export default function SocialSection() {
           }}
         >
           {leftRolling.map((src, i) => (
-            <img
+            <Image
               key={src + "-" + i}
               src={src}
               alt=""
@@ -286,7 +288,7 @@ export default function SocialSection() {
           }}
         >
           {rightRolling.map((src, i) => (
-            <img
+            <Image
               key={src + "-" + i}
               src={src}
               alt=""

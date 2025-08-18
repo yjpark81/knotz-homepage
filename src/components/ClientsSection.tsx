@@ -3,6 +3,8 @@
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { useRef, useEffect } from "react";
+import Link from 'next/link';
+import Image from 'next/image';
 
 // 타입 명시
 type Client = { name: string; logo: string };
@@ -70,7 +72,7 @@ export default function ClientsSection({ clients = [] }: Props) {
               className="keen-slider__slide flex justify-center items-center"
               key={c.logo}
             >
-              <img
+              <Image
                 src={c.logo}
                 alt={c.name}
                 className="w-32 h-16 object-contain shadow-lg bg-transparent rounded transition"

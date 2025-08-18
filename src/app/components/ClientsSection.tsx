@@ -3,6 +3,8 @@
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { useRef, useEffect } from "react";
+import Link from 'next/link';
+import Image from 'next/image';
 
 // 타입 명시
 type Client = { name: string; logo: string };
@@ -81,7 +83,7 @@ export default function ClientsSection({ clients = [] }: Props) {
                 margin: "0 auto",
               }}
             >
-              <img
+              <Image
                 src={c.logo}
                 alt={c.name}
                 title={c.name}

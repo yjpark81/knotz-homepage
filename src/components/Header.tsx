@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname();
@@ -70,13 +71,13 @@ export default function Header() {
             사업문의
           </Link>
         </div>
-        <a href="/">
-          <img
+        <Link href="/">
+          <Image
             src="/knotz-logo.png"
             alt="Knotz 로고"
             className="h-8 w-auto"
           />
-        </a>
+        </Link>
       </div>
     </header>
   );

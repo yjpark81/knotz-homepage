@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface NewsItem {
   title: string;
   date: string;
   desc: string;
   link: string;
-  image: string;
+  Image: string;
 }
 
 const newsData: NewsItem[] = [
@@ -15,28 +17,28 @@ const newsData: NewsItem[] = [
     date: "2024.05.23",
     desc: "노츠와 큐게임즈가 전략적 제휴 및 상호 협업을 위한 업무협약을 체결했습니다. 이번 협약을 통해 소프트웨어 및 게임 테스트 분야에서의 협업과 글로벌 시장 진출 지원이 기대됩니다...",
     link: "https://www.edaily.co.kr/News/Read?newsId=02568246629150272&mediaCodeNo=257",
-    image: "/news1.jpg",
+    Image: "/news1.jpg",
   },
   {
     title: "노츠-스패로우, 전략적 업무협약 체결",
     date: "2023.11.10",
     desc: "노츠와 스패로우가 전략적 사업 협력을 위한 업무 협약을 체결했습니다. 이번 협약으로 멀티서비스 영역 확장과 고품질 시큐어코딩 제공 등 상생 발전이 기대됩니다...",
     link: "https://www.itbiznews.com/news/articleView.html?idxno=56006",
-    image: "/news2.jpg",
+    Image: "/news2.jpg",
   },
   {
     title: "노츠 주식회사, 서울석병원과 지정병원 협약 체결",
     date: "2024.03.10",
     desc: "노츠와 서울석병원이 임직원 및 가족들의 건강관리를 위한 지정병원 협약을 체결했습니다. 노츠 임직원들은 다양한 진료편의와 종합검진서비스를 제공받게 됩니다...",
     link: "https://www.itbiznews.com/news/articleView.html?idxno=63746",
-    image: "/news3.jpg",
+    Image: "/news3.jpg",
   },
   {
     title: "노츠 주식회사, 베트남 SGTC 개소 및 MOU체결",
     date: "2024.01.05",
     desc: "노츠가 베트남 하노이에 SGTC를 개소하고 WISEWIRES VIETNAM법인과 MOU를 체결했습니다. 현지화된 테스트 및 운영서비스로 동남아 시장 진출 교두보 역할을 할 예정입니다...",
     link: "https://www.itbiznews.com/news/articleView.html?idxno=86233",
-    image: "/news4.jpg",
+    Image: "/news4.jpg",
   },
 ];
 
@@ -114,8 +116,8 @@ export default function NewsSection() {
                 }}
               >
                 <div className="h-40 w-full relative">
-                  <img
-                    src={news.image}
+                  <Image
+                    src={news.Image}
                     alt={news.title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
@@ -124,7 +126,7 @@ export default function NewsSection() {
                   </span>
                 </div>
                 <div className="flex-1 flex flex-col p-4">
-                  <a
+                  <Link
                     href={news.link}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -133,7 +135,7 @@ export default function NewsSection() {
                     tabIndex={-1}
                   >
                     {news.title}
-                  </a>
+                  </Link>
                   <p
                     className="text-gray-600 text-xs mb-2"
                     style={{
@@ -148,14 +150,14 @@ export default function NewsSection() {
                   >
                     {news.desc}
                   </p>
-                  <a
+                  <Link
                     href={news.link}
                     className="mt-auto text-blue-600 text-xs hover:underline font-semibold self-end transition-colors duration-150"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     상세 보기
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}

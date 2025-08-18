@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
@@ -45,13 +47,13 @@ export default function Home() {
           </div>
 
           {/* 로고 */}
-          <a href="/">
+          <Link href="/">
             <img
               src="/knotz-logo.png"
               alt="Knotz 로고"
               className="h-8 w-auto"
             />
-          </a>
+          </Link>
         </div>
       </header>
 
