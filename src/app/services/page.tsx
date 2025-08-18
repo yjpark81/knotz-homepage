@@ -394,7 +394,7 @@ export default function ServiceDetailPage() {
                   <div className="relative w-[450px] h-[280px] rounded-xl shadow bg-white overflow-hidden border border-gray-200">
                     {/* 지도 이미지 */}
                     <Image
-                      src="/clients/worldmap.png"
+                      src="/worldmap.png"
                       alt="세계지도"
                       fill
                       style={{ objectFit: "contain" }}
