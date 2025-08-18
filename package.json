@@ -14,10 +14,10 @@
     "keen-slider": "^6.8.6",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.514.0",
-    "next": "15.3.3",
-    "react": "^19.1.0",
+    "next": "latest",
+    "react": "latest",
     "react-countup": "^6.5.3",
-    "react-dom": "^19.0.0"
+    "react-dom": "^latest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
