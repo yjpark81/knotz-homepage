@@ -1,14 +1,26 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
-import Link from 'next/link';
-import Image from 'next/image';
 
+import { useRef, useEffect, useState } from "react";
+import Image from "next/image";
+
+// ── 이미지 소스 (public/ 경로에 파일 존재 필요) ──────────────────────────────
 const leftImages = ["/art1.jpg", "/art2.jpg", "/art3.jpg", "/art4.jpg"];
 const rightImages = ["/art5.jpg", "/art6.jpg", "/art7.jpg", "/art8.jpg"];
-const rollingRepeat = 2;
-const gapPx = 24;
 
-function getRollingArr(arr) {
+// ── 레이아웃/롤링 상수 (UI 고정값) ─────────────────────────────────────────
+const rollingRepeat = 2;   // 이미지 세트를 몇 번 반복할지
+const GAP_PX = 24;         // Tailwind gap-6 = 24px
+const ITEM_H = 280;        // 각 카드 높이(px) — 기존 스타일 유지
+const COL_W = 480;         // 좌/우 컬럼 폭(px) — 기존 스타일 유지
+const CONTAINER_H = 935;   // 좌/우 컬럼 높이(px) — 기존 스타일 유지
+
+// "원본 세트(4장)"의 총 높이(이미지 높이 + 간격)
+const ROLLING_SET_H = ITEM_H * leftImages.length + GAP_PX * (leftImages.length - 1);
+
+// 속도(px/frame). 60fps 기준 약 30px/s
+const SPEED = 0.5;
+
+function getRollingArr(arr: string[]) {
   return Array(rollingRepeat).fill(arr).flat();
 }
 
@@ -16,42 +28,34 @@ export default function SocialSection() {
   const leftRolling = getRollingArr(leftImages);
   const rightRolling = getRollingArr(rightImages);
 
-  const leftListRef = useRef(null);
-  const rightListRef = useRef(null);
-  const [itemHeight, setItemHeight] = useState(0);
-  const [rollingSetHeight, setRollingSetHeight] = useState(0);
+  const leftListRef = useRef<HTMLDivElement | null>(null);
+  const rightListRef = useRef<HTMLDivElement | null>(null);
 
+  // ── requestAnimationFrame 기반 자동 롤링(높이 측정 없이 상수로 계산) ───────
   useEffect(() => {
-    if (leftListRef.current) {
-      const Images = leftListRef.current.querySelectorAll("Image");
-      if (Images.length > 0) {
-        const h = Images[0].clientHeight;
-        setItemHeight(h);
-        setRollingSetHeight(h * leftImages.length + gapPx * (leftImages.length - 1));
-      }
-    }
-  }, []);
+    let leftPos = 0;
+    let rightPos = 0;
+    let reqId = 0;
 
-  useEffect(() => {
-    if (!rollingSetHeight) return;
-    let leftPos = 0, rightPos = 0, reqId = 0;
-    function step() {
+    const step = () => {
+      // 위로 자연스럽게 스크롤
       if (leftListRef.current) {
-        leftPos += 0.5;
-        if (leftPos >= rollingSetHeight) leftPos -= rollingSetHeight;
+        leftPos = (leftPos + SPEED) % ROLLING_SET_H;
         leftListRef.current.scrollTop = leftPos;
       }
+      // 반대 방향(아래→위 반전 효과)
       if (rightListRef.current) {
-        rightPos += 0.5;
-        if (rightPos >= rollingSetHeight) rightPos -= rollingSetHeight;
-        rightListRef.current.scrollTop = rollingSetHeight - (rightPos % rollingSetHeight);
+        rightPos = (rightPos + SPEED) % ROLLING_SET_H;
+        rightListRef.current.scrollTop = (ROLLING_SET_H - rightPos) % ROLLING_SET_H;
       }
       reqId = requestAnimationFrame(step);
-    }
+    };
+
     reqId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(reqId);
-  }, [rollingSetHeight]);
+  }, []);
 
+  // ── 폼 상태 ───────────────────────────────────────────────────────────────
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -63,9 +67,10 @@ export default function SocialSection() {
     agree: false,
   });
 
-  function setField(name, value) {
-    setForm(f => ({ ...f, [name]: value }));
+  function setField(name: string, value: any) {
+    setForm((f) => ({ ...f, [name]: value }));
   }
+
   function checkRequiredFields() {
     if (!form.name) return "성함을 입력해 주세요.";
     if (!form.email) return "이메일을 입력해 주세요.";
@@ -76,7 +81,8 @@ export default function SocialSection() {
     if (!form.agree) return "개인정보 수집에 동의해 주세요.";
     return null;
   }
-  function handleSubmit(e) {
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const msg = checkRequiredFields();
     if (msg) return alert(msg);
@@ -94,18 +100,21 @@ export default function SocialSection() {
           style={{
             zIndex: 2,
             marginLeft: "-256px",
-            width: 480,
-            height: 935,
+            width: COL_W,
+            height: CONTAINER_H,
             minHeight: 80,
           }}
         >
           {leftRolling.map((src, i) => (
             <Image
-              key={src + "-" + i}
+              key={`${src}-${i}`}
               src={src}
-              alt=""
-              className="rounded-xl w-full object-cover"
-              style={{ height: "280px" }}
+              alt={`작품 ${i + 1}`}
+              width={COL_W}
+              height={ITEM_H}
+              className="rounded-xl w-full object-cover h-[280px]"
+              sizes="(min-width:1024px) 480px, 100vw"
+              priority={i === 0} // 첫 장만 우선 로드
             />
           ))}
         </div>
@@ -121,12 +130,15 @@ export default function SocialSection() {
               장애인 화가 작품 갤러리 &middot; 예술을 통한 사회적 가치 실현
             </div>
             <div className="w-full text-left text-[15px] text-gray-800 font-normal leading-relaxed mb-2">
-              <b>한마음일자리</b><br />
-              한마음일자리는 노츠가 2023년부터 진행한 ‘보다 좋은 세상 만들기 운동’의 일환 중 하나인 사회공헌 프로그램입니다. 이를 통해 장애인 고용을 창출하고, 
-              장애인미술작가는 지속적인 예술 활동으로 세상과 소통할 수 있는 기회를 갖게 됩니다.<br />
+              <b>한마음일자리</b>
+              <br />
+              한마음일자리는 노츠가 2023년부터 진행한 ‘보다 좋은 세상 만들기 운동’의 일환 중 하나인 사회공헌 프로그램입니다. 이를 통해 장애인 고용을 창출하고,
+              장애인미술작가는 지속적인 예술 활동으로 세상과 소통할 수 있는 기회를 갖게 됩니다.
+              <br />
               ‘하나로 합친 마음’, ‘변함 없는 마음’, ‘모든 사람은 마음이 모여 이루어진 덩어리’라는 뜻을 가진 ‘한마음’이라는 단어를 사용해
               ‘한마음일자리’로 이름을 정하고, 2023년부터 장애인미술작가와 함께 보다 좋은 세상 만들기 운동을 함께 하고 있습니다.
             </div>
+
             {/* 폼 */}
             <form
               className="w-full max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-7 bg-white rounded-2xl shadow-lg p-6 mt-0 pt-0"
@@ -143,7 +155,7 @@ export default function SocialSection() {
                   className="border border-gray-300 rounded-xl px-4 py-1.5 w-full focus:ring-2 focus:ring-blue-200 outline-none transition"
                   placeholder="이름을 남겨 주세요."
                   value={form.name}
-                  onChange={e => setField("name", e.target.value)}
+                  onChange={(e) => setField("name", e.target.value)}
                 />
               </div>
               <div>
@@ -154,7 +166,7 @@ export default function SocialSection() {
                   id="applyType"
                   className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:ring-2 focus:ring-blue-200 outline-none transition bg-white"
                   value={form.applyType}
-                  onChange={e => setField("applyType", e.target.value)}
+                  onChange={(e) => setField("applyType", e.target.value)}
                 >
                   <option value="">하나를 선택해 주세요.</option>
                   <option>회화</option>
@@ -175,7 +187,7 @@ export default function SocialSection() {
                   placeholder="example@example.com"
                   type="email"
                   value={form.email}
-                  onChange={e => setField("email", e.target.value)}
+                  onChange={(e) => setField("email", e.target.value)}
                 />
               </div>
               <div>
@@ -186,7 +198,7 @@ export default function SocialSection() {
                   id="topic"
                   className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:ring-2 focus:ring-blue-200 outline-none transition bg-white"
                   value={form.topic}
-                  onChange={e => setField("topic", e.target.value)}
+                  onChange={(e) => setField("topic", e.target.value)}
                 >
                   <option value="">하나를 선택해 주세요.</option>
                   <option>자연</option>
@@ -207,7 +219,7 @@ export default function SocialSection() {
                   placeholder="숫자만 입력해 주세요."
                   type="tel"
                   value={form.phone}
-                  onChange={e => setField("phone", e.target.value)}
+                  onChange={(e) => setField("phone", e.target.value)}
                 />
               </div>
               <div>
@@ -216,9 +228,9 @@ export default function SocialSection() {
                 </label>
                 <select
                   id="grade"
-                  className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:ring-2 focus:ring-blue-200 outline-none transition bg-white"
+                  className="border border-gray-300 rounded-xl px-4 py-2 w/full focus:ring-2 focus:ring-blue-200 outline-none transition bg-white"
                   value={form.grade}
-                  onChange={e => setField("grade", e.target.value)}
+                  onChange={(e) => setField("grade", e.target.value)}
                 >
                   <option value="">하나를 선택해 주세요.</option>
                   <option>경증</option>
@@ -236,7 +248,7 @@ export default function SocialSection() {
                   className="border border-gray-300 rounded-xl px-4 py-4 w-full min-h-[120px] text-normal focus:ring-2 focus:ring-blue-200 outline-none transition resize-none"
                   placeholder="문의 내용을 입력해 주세요."
                   value={form.message}
-                  onChange={e => setField("message", e.target.value)}
+                  onChange={(e) => setField("message", e.target.value)}
                   style={{ minHeight: 120 }}
                 />
               </div>
@@ -248,17 +260,21 @@ export default function SocialSection() {
                     <input
                       type="checkbox"
                       checked={form.agree}
-                      onChange={e => setField("agree", e.target.checked)}
+                      onChange={(e) => setField("agree", e.target.checked)}
                       className="mr-2 accent-blue-600 scale-125"
                     />
                     개인정보수집에 동의합니다.
                     <span className="text-red-500 font-bold ml-1">*</span>
                   </label>
                   <div className="text-[11px] text-gray-700 leading-relaxed">
-                    <span className="font-bold">개인정보 수집 이용 목적</span>은 한마음일자리 채용과 관련한 정보를 수집하기 위해서입니다.<br />
-                    <span className="font-bold">수집하는 개인정보</span>는 이름, 이메일, 휴대전화, 지원분야, 주제, 종합 장애 정도는 필수입니다.<br />
-                    <span className="font-bold">개인정보 보유 및 이용기간</span>은 3년이며, 제3자에게 제공하지 않습니다.<br />
-                    문의자의 요청에 따라 열람, 정정, 삭제, 처리정지 등 대응 받을 권리가 있습니다.<br />
+                    <span className="font-bold">개인정보 수집 이용 목적</span>은 한마음일자리 채용과 관련한 정보를 수집하기 위해서입니다.
+                    <br />
+                    <span className="font-bold">수집하는 개인정보</span>는 이름, 이메일, 휴대전화, 지원분야, 주제, 종합 장애 정도는 필수입니다.
+                    <br />
+                    <span className="font-bold">개인정보 보유 및 이용기간</span>은 3년이며, 제3자에게 제공하지 않습니다.
+                    <br />
+                    문의자의 요청에 따라 열람, 정정, 삭제, 처리정지 등 대응 받을 권리가 있습니다.
+                    <br />
                     단, 필수항목의 수집 및 이용에 대해 동의하지 않을 경우에는 접수 및 처리가 제한됩니다.
                   </div>
                 </div>
@@ -270,11 +286,9 @@ export default function SocialSection() {
                 </button>
               </div>
             </form>
-
-
-
           </div>
         </div>
+
         {/* 우측 롤링 */}
         <div
           ref={rightListRef}
@@ -282,22 +296,25 @@ export default function SocialSection() {
           style={{
             zIndex: 2,
             marginRight: "-256px",
-            width: 480,
-            height: 935,
+            width: COL_W,
+            height: CONTAINER_H,
             minHeight: 80,
           }}
         >
           {rightRolling.map((src, i) => (
             <Image
-              key={src + "-" + i}
+              key={`${src}-${i}`}
               src={src}
-              alt=""
-              className="rounded-xl w-full object-cover"
-              style={{ height: "280px" }}
+              alt={`작품 ${i + 1}`}
+              width={COL_W}
+              height={ITEM_H}
+              className="rounded-xl w-full object-cover h-[280px]"
+              sizes="(min-width:1024px) 480px, 100vw"
             />
           ))}
         </div>
       </div>
+
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
