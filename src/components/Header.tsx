@@ -75,6 +75,9 @@ export default function Header() {
           <Image
             src="/knotz-logo.png"
             alt="Knotz 로고"
+            width={160}
+            height={40}
+            priority
             className="h-8 w-auto"
           />
         </Link>
