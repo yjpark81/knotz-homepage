@@ -40,9 +40,9 @@ export default function Header() {
               서비스
             </Link>
             <Link
-              href="/culture"
+              href="/recruit"
               className={`transition min-w-[90px] text-center ${
-                pathname.startsWith("/culture") ? "text-blue-600 font-bold" : "hover:text-blue-900"
+                pathname.startsWith("/recruit") ? "text-blue-600 font-bold" : "hover:text-blue-900"
               }`}
             >
               채용 & 기업문화
