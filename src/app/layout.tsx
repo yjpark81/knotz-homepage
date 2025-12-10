@@ -2,6 +2,7 @@ import "./globals.css";
 import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BackToTopButton from "../components/BackToTopButton";  // ← 추가
 
 // ✅ 함수 아님! 준비된 객체를 import
 import { GeistSans } from "geist/font/sans";
@@ -23,6 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <Header />
         {children}
+
+        <BackToTopButton />
+
         <Footer />
       </body>
     </html>

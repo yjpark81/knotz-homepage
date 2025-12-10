@@ -1,92 +1,86 @@
-import {
-  ClipboardCheck,
-  BarChart2,
-  Globe,
-  Layers,
-} from "lucide-react";
+// src/components/ServiceSection.tsx
+import Link from "next/link";
+import { ClipboardCheck, BarChart2, Globe, Layers } from "lucide-react";
 
-// 각 서비스별 아이콘 및 타이틀
 const services = [
   {
     icon: ClipboardCheck,
     title: "기능 테스트",
+    desc: "요구사항 기반의 시나리오와 테스트케이스 설계를 통해 서비스가 기획 의도대로 동작하는지 검증합니다.",
+    href: "/services#functional",
   },
   {
     icon: BarChart2,
     title: "비기능 테스트",
+    desc: "성능·보안·사용성 등 품질 특성을 종합적으로 점검하여 안정적인 서비스 운영을 지원합니다.",
+    href: "/services#nonfunctional",
   },
   {
     icon: Globe,
     title: "글로벌 테스트",
+    desc: "해외 OTC와 현지 환경 기반의 필드 테스트로 글로벌 사용자를 위한 품질을 확보합니다.",
+    href: "/services#global",
   },
   {
     icon: Layers,
     title: "멀티 서비스",
+    desc: "보안 진단, 자동화, RPA 등 IT 파트너와 협업한 One-Contact Multi Service를 제공합니다.",
+    href: "/services#multi",
   },
 ];
 
-// 아이콘별 랜덤 부유효과 스타일 함수
-function getFloatStyle(idx: number) {
-  const durations = [2.8, 3.2, 2.5, 3.6];
-  const delays = [0, 0.4, 0.2, 0.6];
-  return {
-    animation: `floatUpDown ${durations[idx % durations.length]}s ease-in-out infinite`,
-    animationDelay: `${delays[idx % delays.length]}s`,
-    display: "block",
-  };
-}
-
 export default function ServiceSection() {
   return (
-    <section id="services" style={{ backgroundColor: "#f5faff" }} className="py-16">
-      <style>
-        {`
-          @keyframes floatUpDown {
-            0% { transform: translateY(0px);}
-            20% { transform: translateY(-18px);}
-            40% { transform: translateY(0px);}
-            60% { transform: translateY(12px);}
-            80% { transform: translateY(0px);}
-            100% { transform: translateY(0px);}
-          }
-        `}
-      </style>
+    <section
+      id="home-services"
+      className="w-full bg-[#f5faff] py-10 sm:py-14" 
+      // ← border-t 삭제함!
+    >
       <div className="max-w-7xl mx-auto px-4">
-        {/* 제목+버튼+소개문구 */}
-        <div className="mb-10">
-          <div className="flex items-center mb-2">
-            <h2 className="text-xl font-bold mr-3">서비스</h2>
-            <a
-              href="/services"
-              className="inline-block px-4 py-1.5 text-sm rounded font-bold text-blue-600 border border-blue-600 hover:bg-blue-600 hover:text-white transition"
-              style={{ lineHeight: "1.2" }}
-            >
-              이동하기
-            </a>
+        {/* 제목 영역 */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6 sm:mb-8">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#111827]">
+              서비스 영역
+            </h2>
+            <p className="mt-1 text-sm sm:text-[15px] text-gray-600">
+              기능·비기능·글로벌 테스트까지, 노츠가 제공하는 주요 서비스입니다.
+            </p>
           </div>
-          <p className="text-gray-700 text-base leading-relaxed max-w-3xl md:text-left text-left">
-            노츠는 고객의 Needs를 충족시키는 최상의 IT서비스를 제공하기 위해<br className="hidden md:block" />
-            끊임없이 고민하고 노력하고 있습니다.
-          </p>
         </div>
-        {/* 서비스 1행, 아이콘+타이틀, 부유효과 */}
-        <div className="flex flex-col md:flex-row items-stretch gap-[210px]">
-          {services.map((s, i) => {
+
+        {/* 카드 리스트 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {services.map((s) => {
             const Icon = s.icon;
             return (
-              <div
+              <Link
                 key={s.title}
-                className="flex-1 flex flex-col items-center justify-center px-6 py-8 md:py-0 min-w-0"
+                href={s.href}
+                className="
+                  group rounded-xl bg-white border border-[#e3ebf6]
+                  shadow-[0_4px_14px_rgba(15,23,42,0.06)]
+                  hover:shadow-[0_8px_24px_rgba(37,99,235,0.22)]
+                  transition-all duration-200
+                  px-4 py-4 sm:px-5 sm:py-5
+                  flex flex-col h-full
+                "
               >
-                <Icon
-                  size={54}
-                  color="#1e3a8a"
-                  strokeWidth={2.2}
-                  style={getFloatStyle(i)}
-                  className="mb-2"
-                />
-                <span className="font-bold text-lg text-gray-900">{s.title}</span>
-              </div>
+                <div className="flex items-center gap-3 sm:gap-3.5">
+                  <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-[#eef2ff] text-[#1d4ed8]">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  <h3 className="text-sm sm:text-[16px] font-extrabold text-[#111827]">
+                    {s.title}
+                  </h3>
+                </div>
+                <p className="mt-3 text-xs sm:text-[13px] leading-6 text-gray-600 flex-1">
+                  {s.desc}
+                </p>
+                <span className="mt-3 text-xs sm:text-[13px] font-semibold text-[#2563eb] group-hover:underline">
+                  자세히 보기
+                </span>
+              </Link>
             );
           })}
         </div>

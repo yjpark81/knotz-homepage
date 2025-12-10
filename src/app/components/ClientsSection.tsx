@@ -1,3 +1,4 @@
+// ClientSection.tsx
 "use client";
 
 import "keen-slider/keen-slider.min.css";
@@ -6,7 +7,6 @@ import { useRef, useEffect } from "react";
 import Link from 'next/link';
 import Image from 'next/image';
 
-// 타입 명시
 type Client = { name: string; logo: string };
 type Props = { clients?: Client[] };
 
@@ -15,28 +15,19 @@ export default function ClientsSection({ clients = [] }: Props) {
 
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
     loop: true,
-    slides: {
-      perView: 6,
-      spacing: 28,
-    },
+    slides: { perView: 6, spacing: 28 },
     mode: "snap",
     drag: true,
     breakpoints: {
-      "(max-width: 900px)": {
-        slides: { perView: 3, spacing: 20 },
-      },
-      "(max-width: 600px)": {
-        slides: { perView: 2, spacing: 12 },
-      },
+      "(max-width: 900px)": { slides: { perView: 3, spacing: 20 } },
+      "(max-width: 600px)": { slides: { perView: 2, spacing: 12 } },
     },
     renderMode: "performance",
   });
 
   useEffect(() => {
     if (!slider) return;
-    function nextSlide() {
-      slider.current?.next();
-    }
+    function nextSlide() { slider.current?.next(); }
     timer.current && clearInterval(timer.current);
     timer.current = setInterval(nextSlide, 7000);
 
@@ -52,9 +43,7 @@ export default function ClientsSection({ clients = [] }: Props) {
       timer.current = setInterval(nextSlide, 7000);
     });
 
-    return () => {
-      timer.current && clearInterval(timer.current);
-    };
+    return () => { timer.current && clearInterval(timer.current); };
   }, [slider]);
 
   return (
@@ -66,36 +55,34 @@ export default function ClientsSection({ clients = [] }: Props) {
             노츠와 함께하는 다양한 산업군의 주요 고객사입니다.
           </p>
         </div>
+
         <div ref={sliderRef} className="keen-slider flex items-center">
-          {(clients ?? []).map((c, i) => (
+          {(clients ?? []).map((c) => (
             <div
+              key={c.logo}
               className="
                 keen-slider__slide flex justify-center items-center
-                bg-white rounded-xl shadow border border-gray-200
-                p-2 box-border
+                bg-white rounded-xl shadow border border-gray-50
+                p-2 box-border relative   /* ✅ fill용 부모: relative */
               "
-              key={c.logo}
               style={{
-                width: "120px",
-                height: "54px",
-                minWidth: "120px",
-                minHeight: "54px",
+                width: "90px",
+                height: "50px",
+                minWidth: "90px",
+                minHeight: "50px",
                 margin: "0 auto",
               }}
+              title={c.name}
             >
+              {/* ✅ 크기 정보 제공: fill + sizes */}
               <Image
                 src={c.logo}
                 alt={c.name}
-                title={c.name}
+                fill
+                sizes="120px"                  // 카드 너비와 맞춤
+                className="object-contain scale-75"     // 로고 비율 유지
                 loading="lazy"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  background: "transparent",
-                  display: "block",
-                  // 필요하다면 maxWidth/maxHeight 등도 추가 가능
-                }}
+                priority={false}
               />
             </div>
           ))}

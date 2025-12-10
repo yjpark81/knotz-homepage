@@ -1,7 +1,8 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
 
 interface NewsItem {
   title: string;
@@ -42,38 +43,53 @@ const newsData: NewsItem[] = [
   },
 ];
 
-const CARD_COUNT = newsData.length;
-const VIEW_COUNT = 3;
-const INTERVAL_MS = 7000;
+// 카드/간격 설정
+const CARD_WIDTH = 340;
+const GAP = 32;
+// 1초에 몇 px 이동할지 (값을 줄이면 느려지고, 늘리면 빨라짐)
+const SPEED_PX_PER_SEC = 20;
 
 export default function NewsSection() {
-  const [slideIdx, setSlideIdx] = useState(0);
-  const timer = useRef<NodeJS.Timeout | null>(null);
+  // 왼쪽으로 얼마나 이동했는지 (px)
+  const [offset, setOffset] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+
+  // 총 한 줄 너비
+  const rowWidth = (CARD_WIDTH + GAP) * newsData.length;
 
   useEffect(() => {
-    timer.current && clearInterval(timer.current);
-    timer.current = setInterval(() => {
-      setSlideIdx((prev) => (prev + 1) % CARD_COUNT);
-    }, INTERVAL_MS);
-    return () => timer.current && clearInterval(timer.current);
-  }, []);
+    const step = (timestamp: number) => {
+      if (lastTimeRef.current == null) {
+        lastTimeRef.current = timestamp;
+        rafRef.current = requestAnimationFrame(step);
+        return;
+      }
 
-  // 카드 뷰: 항상 VIEW_COUNT+1개까지 보여주고 무한 루프 효과
-  const slideItems = [];
-  for (let i = 0; i < VIEW_COUNT + 1; i++) {
-    const idx = (slideIdx + i) % CARD_COUNT;
-    slideItems.push(newsData[idx]);
-  }
+      const deltaMs = timestamp - lastTimeRef.current;
+      lastTimeRef.current = timestamp;
 
-  // 트랜지션 끝나면(끝으로 도달 시) 트릭으로 처음으로 순간 이동 (loop)
-  const [transitioning, setTransitioning] = useState(false);
+      setOffset((prev) => {
+        let next = prev + (SPEED_PX_PER_SEC * deltaMs) / 1000; // 오른쪽→왼쪽으로 보이게 translateX에서 -next 사용
+        // 한 줄 길이를 넘으면 다시 0부터 (끊김 없이 보이도록)
+        if (next >= rowWidth) {
+          next -= rowWidth;
+        }
+        return next;
+      });
 
-  useEffect(() => {
-    setTransitioning(true);
-  }, [slideIdx]);
+      rafRef.current = requestAnimationFrame(step);
+    };
 
-  const CARD_WIDTH = 340;
-  const GAP = 32;
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [rowWidth]);
+
+  // 끊김 없이 이어지게 하기 위해 데이터 두 번 이어 붙임
+  const loopData = newsData.concat(newsData);
 
   return (
     <section className="bg-white py-16">
@@ -82,7 +98,6 @@ export default function NewsSection() {
           style={{
             overflow: "hidden",
             width: "100%",
-            /* width: CARD_WIDTH * VIEW_COUNT + GAP * (VIEW_COUNT - 1), */
             margin: "0 auto",
           }}
         >
@@ -90,24 +105,16 @@ export default function NewsSection() {
             style={{
               display: "flex",
               gap: `${GAP}px`,
-              transition: transitioning ? "transform 0.7s cubic-bezier(.4,0,.2,1)" : "none",
-              transform: `translateX(-${slideIdx * (CARD_WIDTH + GAP)}px)`,
-              width: (CARD_WIDTH + GAP) * slideItems.length,
-            }}
-            onTransitionEnd={() => {
-              // 무한루프 효과: 마지막이 끝나면 바로 첫 카드로 이동
-              if (slideIdx === CARD_COUNT) {
-                setTransitioning(false);
-                setSlideIdx(0);
-              }
+              transform: `translateX(-${offset}px)`,
+              // transition 없음! → 계속 부드럽게 흘러가도록
             }}
           >
-            {newsData.concat(newsData[0]).slice(0, CARD_COUNT + 1).map((news, idx) => (
+            {loopData.map((news, idx) => (
               <div
                 key={news.title + idx}
                 className="border border-gray-200 rounded-lg shadow-sm flex flex-col overflow-hidden group transition-all duration-400 ease-out"
                 style={{
-                  backgroundColor: "#f5faff", // 카드 전체 배경
+                  backgroundColor: "#f5faff",
                   width: CARD_WIDTH,
                   minWidth: CARD_WIDTH,
                   maxWidth: CARD_WIDTH,
@@ -119,7 +126,9 @@ export default function NewsSection() {
                   <Image
                     src={news.Image}
                     alt={news.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    fill
+                    sizes="340px"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   <span className="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded text-xs text-gray-600 font-medium shadow">
                     {news.date}

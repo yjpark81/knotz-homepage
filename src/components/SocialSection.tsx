@@ -123,7 +123,7 @@ export default function SocialSection() {
         <div className="flex-1 flex flex-col items-center justify-start px-6">
           <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl p-7 flex flex-col gap-3">
             {/* 타이틀+설명 */}
-            <h2 className="text-3xl md:text-4xl font-extrabold text-blue-900 text-center mb-1">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-blue-900 text-center mb-1">
               Knotz 사회공헌
             </h2>
             <div className="text-center text-lg text-gray-600 font-medium mb-4">
